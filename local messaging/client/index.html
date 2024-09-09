@@ -1,0 +1,105 @@
+<head>
+    <title>Local Messaging</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10%;
+            text-wrap: wrap;
+            word-wrap: break-word;
+            padding: 2.5px;
+        }
+
+        .input-container {
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            text-wrap: wrap;
+            background-color: #f0f0f0;
+        }
+
+        input[type="text"] {
+            width: 50%;
+            text-align: center;
+
+        }
+
+        .message-input {
+            width: 75%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="messages"></div>
+
+    <div class="input-container">
+        <input type="text" placeholder="Choose name..." maxlength="24">
+        <button onclick="main()">Join Chat</button>
+    </div>
+
+    <script>
+        function main() {
+            function send(value) {
+                socket.emit('message', value);
+            }
+
+            var socket = io();
+            var i = document.querySelector("input[type='text']");
+            var b = document.querySelector("button");
+
+            if (i.value.trim() !== "" && i.value.trim() !== "admin" && i.value.trim() !== "[Server]") {
+                socket.emit('name', i.value.toLowerCase());
+            } else {
+                i.value = "";
+                i.placeholder = "Please choose a VALID name...";
+                return;
+            }
+
+            i.remove();
+            b.remove();
+
+            var id = "";
+
+            socket.on('sendID', (data) => {
+                id = data;
+            });
+
+            socket.on('sendMessage', (data) => {
+                var a = document.createElement('p');
+                var sender = data.sender === id ? "You" : data.sender;
+                a.textContent = `${sender}: ${data.message}`;
+                document.getElementById('messages').appendChild(a);
+                document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+            });
+
+            let input = document.createElement('input');
+            input.className = 'message-input';
+            input.placeholder = "Type message here";
+            input.maxLength = 500;
+            document.querySelector(".input-container").appendChild(input);
+
+            input.addEventListener('keydown', (e) => {
+                if (e.keyCode == 13) {
+                    send(input.value);
+                    input.value = "";
+                }
+            });
+        }
+    </script>
+</body>

@@ -1,0 +1,14 @@
+{
+  "name": "local-messaging",
+  "version": "1.0.0",
+  "description": "local messaging proof of concept using socket.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "andy galvez",
+  "license": "ISC",
+  "dependencies": {
+    "uuid": "^10.0.0"
+  }
+}
